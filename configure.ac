@@ -1107,6 +1107,46 @@ dnl are free to remove them in the future.
 ])
 AC_MSG_RESULT([$ac_sys_emscripten_target])
 
+
+# AC_MSG_CHECKING([for --enable-emscripten-modularize])
+# AC_ARG_WITH([emscripten-target],
+#   [AS_HELP_STRING([--enable-emscripten-modularize=@<:@browser|node@:>@], [Emscripten platform])],
+# [
+# 	AS_VAR_IF([ac_sys_system], [Emscripten], [
+#     AS_CASE([$with_emscripten_target],
+#       [browser], [ac_sys_emscripten_target=browser],
+#       [node], [ac_sys_emscripten_target=node],
+# dnl Debug builds with source map / dwarf symbols. Py_DEBUG builds easily
+# dnl run out of stack space. Detached sybmols and map prohibit some
+# dnl optimizations and increase file size. Options are undocumented so we
+# dnl are free to remove them in the future.
+#       [browser-debug], [ac_sys_emscripten_target=browser-debug],
+#       [node-debug], [ac_sys_emscripten_target=node-debug],
+#       [AC_MSG_ERROR([Invalid argument: --with-emscripten-target=browser|node])]
+#     )
+#   ], [
+#     AC_MSG_ERROR([--with-emscripten-target only applies to Emscripten])
+#   ])
+# ], [
+#   AS_VAR_IF([ac_sys_system], [Emscripten], [ac_sys_emscripten_target=browser])
+# ])
+# AC_MSG_RESULT([$ac_sys_emscripten_target])
+
+AC_MSG_CHECKING([for --enable-emscripten-modularize])
+AC_ARG_ENABLE([emscripten-modularize],
+  [AS_HELP_STRING([--enable-emscripten-modularize],
+                  [Enable pthread emulation for WebAssembly (default is no)])],
+[
+  AS_CASE([$ac_sys_system],
+    [Emscripten], [],
+    [AC_MSG_ERROR([--enable-emscripten-modularize only applies to Emscripten])]
+  )
+], [
+  enable_emscripten_modularize=missing
+])
+AC_MSG_RESULT([$enable_emscripten_modularize])
+
+
 dnl On Emscripten dlopen() requires -s MAIN_MODULE and -fPIC. The flags
 dnl disables dead code elimination and increases the size of the WASM module
 dnl by about 1.5 to 2MB. MAIN_MODULE defines __wasm_mutable_globals__.
@@ -1929,7 +1969,7 @@ AS_CASE([$ac_sys_system],
     dnl build with WASM debug info if either Py_DEBUG is set or the target is
     dnl node-debug or browser-debug.
     AS_VAR_IF([Py_DEBUG], [yes], [wasm_debug=yes], [wasm_debug=no])
-    
+
     dnl Start with 20 MB and allow to grow
     AS_VAR_APPEND([LDFLAGS_NODIST], [" -sALLOW_MEMORY_GROWTH -sTOTAL_MEMORY=20971520"])
 
@@ -1938,6 +1978,10 @@ AS_CASE([$ac_sys_system],
 
     AS_VAR_IF([enable_wasm_dynamic_linking], [yes], [
       AS_VAR_APPEND([LINKFORSHARED], [" -sMAIN_MODULE"])
+    ])
+
+    AS_VAR_IF([enable_emscripten_modularize], [yes], [
+      AS_VAR_APPEND([LINKFORSHARED], [" -sMODULARIZE"])
     ])
 
     AS_VAR_IF([enable_wasm_pthreads], [yes], [

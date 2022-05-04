@@ -1965,9 +1965,6 @@ AS_CASE([$ac_sys_system],
     dnl Start with 20 MB and allow to grow
     AS_VAR_APPEND([LDFLAGS_NODIST], [" -sALLOW_MEMORY_GROWTH -sTOTAL_MEMORY=20971520"])
 
-    dnl Include file system support
-    AS_VAR_APPEND([LDFLAGS_NODIST], [" -sFORCE_FILESYSTEM -lidbfs.js -lnodefs.js -lproxyfs.js -lworkerfs.js"])
-
     AS_VAR_IF([enable_wasm_dynamic_linking], [yes], [
       AS_VAR_APPEND([LINKFORSHARED], [" -sMAIN_MODULE"])
     ])
@@ -1986,6 +1983,12 @@ AS_CASE([$ac_sys_system],
       [browser*], [
         AS_VAR_IF([ac_sys_emscripten_target], [browser-debug], [wasm_debug=yes])
         AS_VAR_APPEND([LINKFORSHARED], [" --preload-file=\$(WASM_ASSETS_DIR)"])
+
+        dnl Include file system support
+        dnl REFERENCE https://emscripten.org/docs/api_reference/Filesystem-API.html#file-systems
+        dnl remove nodefs for browser case
+        AS_VAR_APPEND([LDFLAGS_NODIST], [" -sFORCE_FILESYSTEM -lidbfs.js -lproxyfs.js -lworkerfs.js"])
+
         WASM_ASSETS_DIR=".\$(prefix)"
         WASM_STDLIB="\$(WASM_ASSETS_DIR)/local/lib/python\$(VERSION)/os.py"
         dnl separate-dwarf does not seem to work in Chrome DevTools Support.

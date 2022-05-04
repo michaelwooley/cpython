@@ -8597,8 +8597,6 @@ fi
 
         as_fn_append LDFLAGS_NODIST " -sALLOW_MEMORY_GROWTH -sTOTAL_MEMORY=20971520"
 
-        as_fn_append LDFLAGS_NODIST " -sFORCE_FILESYSTEM -lidbfs.js -lnodefs.js -lproxyfs.js -lworkerfs.js"
-
     if test "x$enable_wasm_dynamic_linking" = xyes
 then :
 
@@ -8630,6 +8628,9 @@ then :
   wasm_debug=yes
 fi
         as_fn_append LINKFORSHARED " --preload-file=\$(WASM_ASSETS_DIR)"
+
+                                as_fn_append LDFLAGS_NODIST " -sFORCE_FILESYSTEM -lidbfs.js -lproxyfs.js -lworkerfs.js"
+
         WASM_ASSETS_DIR=".\$(prefix)"
         WASM_STDLIB="\$(WASM_ASSETS_DIR)/local/lib/python\$(VERSION)/os.py"
                 WASM_LINKFORSHARED_DEBUG="-gsource-map --emit-symbol-map"

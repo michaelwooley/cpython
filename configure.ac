@@ -1990,7 +1990,7 @@ AS_CASE([$ac_sys_system],
     ])
 
     AS_VAR_IF([enable_emscripten_modularize], [yes], [
-      AS_VAR_APPEND([LINKFORSHARED], [" -sMODULARIZE"])
+      AS_VAR_APPEND([LINKFORSHARED], [" -sMODULARIZE -sEXPORT_NAME=createPythonModule"])
     ])
 
     AS_VAR_IF([enable_emscripten_es6], [yes], [

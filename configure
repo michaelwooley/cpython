@@ -8641,7 +8641,7 @@ fi
     if test "x$enable_emscripten_modularize" = xyes
 then :
 
-      as_fn_append LINKFORSHARED " -sMODULARIZE"
+      as_fn_append LINKFORSHARED " -sMODULARIZE -sEXPORT_NAME=createPythonModule"
 
 fi
 

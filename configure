@@ -8641,9 +8641,11 @@ fi
     if test "x$enable_emscripten_modularize" = xyes
 then :
 
-      as_fn_append LINKFORSHARED " -sMODULARIZE -sEXPORT_NAME=createPythonModule"
+      as_fn_append LINKFORSHARED " -sMODULARIZE -sEXPORT_NAME=createPythonModule -sEXTRA_EXPORTED_RUNTIME_METHODS='cwrap' -sEXPORTED_FUNCTIONS='_main'"
 
 fi
+
+            as_fn_append LINKFORSHARED " -sINVOKE_RUN=0"
 
     if test "x$enable_emscripten_es6" = xyes
 then :

@@ -1990,8 +1990,12 @@ AS_CASE([$ac_sys_system],
     ])
 
     AS_VAR_IF([enable_emscripten_modularize], [yes], [
-      AS_VAR_APPEND([LINKFORSHARED], [" -sMODULARIZE -sEXPORT_NAME=createPythonModule"])
+      AS_VAR_APPEND([LINKFORSHARED], [" -sMODULARIZE -sEXPORT_NAME=createPythonModule -sEXTRA_EXPORTED_RUNTIME_METHODS=['cwrap'] -sEXPORTED_FUNCTIONS=['_main']"])
     ])
+
+    dnl noInitialRun flag.
+    dnl TODO Figure out difference in  LINKFORSHARED v. LDFLAGS_NODIST
+    AS_VAR_APPEND([LINKFORSHARED], [" -sINVOKE_RUN=0"])
 
     AS_VAR_IF([enable_emscripten_es6], [yes], [
       AS_VAR_APPEND([LINKFORSHARED], [" -sEXPORT_ES6"])

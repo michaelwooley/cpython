@@ -8692,7 +8692,7 @@ then :
 
 else $as_nop
 
-      as_fn_append LINKFORSHARED " -O2 -g0"
+      as_fn_append LINKFORSHARED " -O3 -g0"
 
 fi
    ;; #(

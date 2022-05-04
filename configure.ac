@@ -2027,7 +2027,7 @@ AS_CASE([$ac_sys_system],
       AS_VAR_APPEND([LDFLAGS_NODIST], [" -sASSERTIONS"])
       AS_VAR_APPEND([LINKFORSHARED], [" $WASM_LINKFORSHARED_DEBUG"])
     ], [
-      AS_VAR_APPEND([LINKFORSHARED], [" -O2 -g0"])
+      AS_VAR_APPEND([LINKFORSHARED], [" -O3 -g0"])
     ])
   ],
   [WASI], [

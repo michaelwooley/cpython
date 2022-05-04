@@ -1155,6 +1155,20 @@ AC_ARG_ENABLE([emscripten-modularize],
 ])
 AC_MSG_RESULT([$enable_emscripten_modularize])
 
+AC_MSG_CHECKING([for --enable-emscripten-es6])
+AC_ARG_ENABLE([emscripten-es6],
+  [AS_HELP_STRING([--enable-emscripten-es6],
+                  [Generate ES6-style JS code (default is no)])],
+[
+  AS_CASE([$ac_sys_system],
+    [Emscripten], [],
+    [AC_MSG_ERROR([--enable-emscripten-es6 only applies to Emscripten])]
+  )
+], [
+  enable_emscripten_es6=missing
+])
+AC_MSG_RESULT([$enable_emscripten_es6])
+
 AC_MSG_CHECKING([for --with-suffix])
 AC_ARG_WITH([suffix],
             [AS_HELP_STRING([--with-suffix=SUFFIX], [set executable suffix to SUFFIX (default is empty, yes is mapped to '.exe')])],
@@ -1977,6 +1991,10 @@ AS_CASE([$ac_sys_system],
 
     AS_VAR_IF([enable_emscripten_modularize], [yes], [
       AS_VAR_APPEND([LINKFORSHARED], [" -sMODULARIZE"])
+    ])
+
+    AS_VAR_IF([enable_emscripten_es6], [yes], [
+      AS_VAR_APPEND([LINKFORSHARED], [" -sEXPORT_ES6"])
     ])
 
     AS_CASE([$ac_sys_emscripten_target],

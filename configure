@@ -1048,6 +1048,7 @@ with_emscripten_target
 enable_wasm_dynamic_linking
 enable_wasm_pthreads
 enable_emscripten_modularize
+enable_emscripten_es6
 with_suffix
 enable_shared
 with_static_libpython
@@ -1768,6 +1769,7 @@ Optional Features:
   --enable-emscripten-modularize
                           Have emscripten generate a JS module with exports
                           rather than a script (default is no)
+  --enable-emscripten-es6 Generate ES6-style JS code (default is no)
   --enable-shared         enable building a shared Python library (default is
                           no)
   --enable-profiling      enable C-level code profiling with gprof (default is
@@ -7017,6 +7019,29 @@ fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_emscripten_modularize" >&5
 printf "%s\n" "$enable_emscripten_modularize" >&6; }
 
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for --enable-emscripten-es6" >&5
+printf %s "checking for --enable-emscripten-es6... " >&6; }
+# Check whether --enable-emscripten-es6 was given.
+if test ${enable_emscripten_es6+y}
+then :
+  enableval=$enable_emscripten_es6;
+  case $ac_sys_system in #(
+  Emscripten) :
+     ;; #(
+  *) :
+    as_fn_error $? "--enable-emscripten-es6 only applies to Emscripten" "$LINENO" 5
+   ;;
+esac
+
+else $as_nop
+
+  enable_emscripten_es6=missing
+
+fi
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $enable_emscripten_es6" >&5
+printf "%s\n" "$enable_emscripten_es6" >&6; }
+
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for --with-suffix" >&5
 printf %s "checking for --with-suffix... " >&6; }
 
@@ -8617,6 +8642,13 @@ fi
 then :
 
       as_fn_append LINKFORSHARED " -sMODULARIZE"
+
+fi
+
+    if test "x$enable_emscripten_es6" = xyes
+then :
+
+      as_fn_append LINKFORSHARED " -sEXPORT_ES6"
 
 fi
 

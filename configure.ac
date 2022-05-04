@@ -2007,6 +2007,9 @@ AS_CASE([$ac_sys_system],
         dnl remove nodefs for browser case
         AS_VAR_APPEND([LDFLAGS_NODIST], [" -sFORCE_FILESYSTEM -lidbfs.js -lproxyfs.js -lworkerfs.js"])
 
+        dnl In emscription:browser can narrow this down
+        AS_VAR_APPEND([LDFLAGS_NODIST], [" -sENVIRONMENT=web,worker"])
+
         WASM_ASSETS_DIR=".\$(prefix)"
         WASM_STDLIB="\$(WASM_ASSETS_DIR)/local/lib/python\$(VERSION)/os.py"
         dnl separate-dwarf does not seem to work in Chrome DevTools Support.

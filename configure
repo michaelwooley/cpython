@@ -8663,6 +8663,8 @@ fi
 
                                 as_fn_append LDFLAGS_NODIST " -sFORCE_FILESYSTEM -lidbfs.js -lproxyfs.js -lworkerfs.js"
 
+                as_fn_append LDFLAGS_NODIST " -sENVIRONMENT=web,worker"
+
         WASM_ASSETS_DIR=".\$(prefix)"
         WASM_STDLIB="\$(WASM_ASSETS_DIR)/local/lib/python\$(VERSION)/os.py"
                 WASM_LINKFORSHARED_DEBUG="-gsource-map --emit-symbol-map"

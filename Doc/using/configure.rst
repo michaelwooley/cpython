@@ -171,6 +171,8 @@ WebAssembly Options
    .. versionadded:: 3.11
 
 
+TODO (MW) Add docs before submitting PR!
+
 Install Options
 ---------------
 

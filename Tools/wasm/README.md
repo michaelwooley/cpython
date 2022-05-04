@@ -34,9 +34,9 @@ docker run --rm -ti -v $(pwd):/python-wasm/cpython quay.io/tiran/cpythonbuild:em
 ### Compile a build Python interpreter
 
 ```shell
-mkdir -p builddir/build
-pushd builddir/build
-../../configure -C
+mkdir -p build/build
+pushd build/build
+../../configure -C --enable-optimizations
 make -j$(nproc)
 popd
 ```
@@ -50,24 +50,58 @@ embuilder build zlib bzip2
 ### Cross compile to wasm32-emscripten for browser
 
 ```shell
-mkdir -p builddir/emscripten-browser
-pushd builddir/emscripten-browser
+mkdir -p build/emscripten-browser
+pushd build/emscripten-browser
 
 CONFIG_SITE=../../Tools/wasm/config.site-wasm32-emscripten \
   emconfigure ../../configure -C \
     --host=wasm32-unknown-emscripten \
     --build=$(../../config.guess) \
     --with-emscripten-target=browser \
-    --with-build-python=$(pwd)/../build/python
+    --with-build-python=$(pwd)/../build/python \
+    --enable-wasm-dynamic-linking=no \
+    --enable-emscripten-modularize=yes \
+    --enable-emscripten-es6=yes
 
 emmake make -j$(nproc)
 popd
 ```
 
+- Setting `--enable-wasm-dynamic-linking=no` causes `python.wasm` to shrink from about 9.1Mb to 5.7Mb.
+- No apparent gain from setting `-Os` relative to `-O3` in terms of file size
+- TODO Trying running with `--with-lto` (ensure rebuild python in `build/build` first.)
+- Using `--enable-optimizations` in the emscripten build causes it to go out and look for ffi.h (i.e. ctypes), etc?
+
+
+```bash
+# A representative --enable-wasm-dynamic-linking=yes build
+# Check out python.js - 3.1Mb?! yikes
+❯ ls build/emscripten-browser/python* -lah
+-rw-r--r-- 1 michael michael 3.0K May  4 02:26 build/emscripten-browser/python-config
+-rw-r--r-- 1 michael michael 2.0K May  4 02:26 build/emscripten-browser/python-config.py
+-rw-r--r-- 1 michael michael 3.1M May  4 02:26 build/emscripten-browser/python.data
+-rw-r--r-- 1 michael michael 7.3K May  4 02:26 build/emscripten-browser/python.html
+-rw-r--r-- 1 michael michael 3.1M May  4 02:26 build/emscripten-browser/python.js
+-rwxr-xr-x 1 michael michael 8.1M May  4 02:26 build/emscripten-browser/python.wasm
+-rw-r--r-- 1 michael michael 2.1K May  4 02:26 build/emscripten-browser/python.worker.js
+
+#
+# Everything the same except --enable-wasm-dynamic-linking=no
+❯ ls build/emscripten-browser/python* -lah
+-rw-r--r-- 1 michael michael 3.0K May  4 02:31 build/emscripten-browser/python-config
+-rw-r--r-- 1 michael michael 2.0K May  4 02:31 build/emscripten-browser/python-config.py
+-rw-r--r-- 1 michael michael 3.1M May  4 02:31 build/emscripten-browser/python.data
+-rw-r--r-- 1 michael michael 7.3K May  4 02:31 build/emscripten-browser/python.html
+-rw-r--r-- 1 michael michael 136K May  4 02:31 build/emscripten-browser/python.js
+-rwxr-xr-x 1 michael michael 5.7M May  4 02:31 build/emscripten-browser/python.wasm
+-rw-r--r-- 1 michael michael 2.1K May  4 02:31 build/emscripten-browser/python.worker.js
+```
+
+
 Serve `python.html` with a local webserver and open the file in a browser.
 
 ```shell
-emrun builddir/emscripten-browser/python.html
+emrun build/emscripten-browser/python.html
 ```
 
 or
@@ -76,15 +110,15 @@ or
 ./Tools/wasm/wasm_webserver.py
 ```
 
-and open http://localhost:8000/builddir/emscripten-browser/python.html . This
+and open http://localhost:8000/build/emscripten-browser/python.html . This
 directory structure enables the *C/C++ DevTools Support (DWARF)* to load C
 and header files with debug builds.
 
 ### Cross compile to wasm32-emscripten for node
 
 ```shell
-mkdir -p builddir/emscripten-node
-pushd builddir/emscripten-node
+mkdir -p build/emscripten-node
+pushd build/emscripten-node
 
 CONFIG_SITE=../../Tools/wasm/config.site-wasm32-emscripten \
   emconfigure ../../configure -C \
@@ -98,7 +132,7 @@ popd
 ```
 
 ```shell
-node --experimental-wasm-threads --experimental-wasm-bulk-memory builddir/emscripten-node/python.js
+node --experimental-wasm-threads --experimental-wasm-bulk-memory build/emscripten-node/python.js
 ```
 
 # wasm32-emscripten limitations and issues
@@ -135,7 +169,7 @@ functions.
 
 - Threading is disabled by default. The ``configure`` option
   ``--enable-wasm-pthreads`` adds compiler flag ``-pthread`` and
-  linker flags ``-sUSE_PTHREADS -sPROXY_TO_PTHREAD``. 
+  linker flags ``-sUSE_PTHREADS -sPROXY_TO_PTHREAD``.
 - pthread support requires WASM threads and SharedArrayBuffer (bulk memory).
   The Node.JS runtime keeps a pool of web workers around. Each web worker
   uses several file descriptors (eventfd, epoll, pipe).

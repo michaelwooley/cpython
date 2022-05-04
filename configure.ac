@@ -1141,6 +1141,20 @@ AC_ARG_ENABLE([wasm-pthreads],
 ])
 AC_MSG_RESULT([$enable_wasm_pthreads])
 
+AC_MSG_CHECKING([for --enable-emscripten-modularize])
+AC_ARG_ENABLE([emscripten-modularize],
+  [AS_HELP_STRING([--enable-emscripten-modularize],
+                  [Have emscripten generate a JS module with exports rather than a script (default is no)])],
+[
+  AS_CASE([$ac_sys_system],
+    [Emscripten], [],
+    [AC_MSG_ERROR([--enable-emscripten-modularize only applies to Emscripten])]
+  )
+], [
+  enable_emscripten_modularize=missing
+])
+AC_MSG_RESULT([$enable_emscripten_modularize])
+
 AC_MSG_CHECKING([for --with-suffix])
 AC_ARG_WITH([suffix],
             [AS_HELP_STRING([--with-suffix=SUFFIX], [set executable suffix to SUFFIX (default is empty, yes is mapped to '.exe')])],
@@ -1947,7 +1961,7 @@ AS_CASE([$ac_sys_system],
     dnl build with WASM debug info if either Py_DEBUG is set or the target is
     dnl node-debug or browser-debug.
     AS_VAR_IF([Py_DEBUG], [yes], [wasm_debug=yes], [wasm_debug=no])
-    
+
     dnl Start with 20 MB and allow to grow
     AS_VAR_APPEND([LDFLAGS_NODIST], [" -sALLOW_MEMORY_GROWTH -sTOTAL_MEMORY=20971520"])
 
@@ -1962,6 +1976,10 @@ AS_CASE([$ac_sys_system],
       AS_VAR_APPEND([CFLAGS_NODIST], [" -pthread"])
       AS_VAR_APPEND([LDFLAGS_NODIST], [" -sUSE_PTHREADS"])
       AS_VAR_APPEND([LINKFORSHARED], [" -sPROXY_TO_PTHREAD"])
+    ])
+
+    AS_VAR_IF([enable_emscripten_modularize], [yes], [
+      AS_VAR_APPEND([LINKFORSHARED], [" -sMODULARIZE"])
     ])
 
     AS_CASE([$ac_sys_emscripten_target],

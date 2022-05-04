@@ -69,9 +69,11 @@ popd
 
 - Setting `--enable-wasm-dynamic-linking=no` causes `python.wasm` to shrink from about 9.1Mb to 5.7Mb.
 - No apparent gain from setting `-Os` relative to `-O3` in terms of file size
-- TODO Trying running with `--with-lto` (ensure rebuild python in `build/build` first.)
 - Using `--enable-optimizations` in the emscripten build causes it to go out and look for ffi.h (i.e. ctypes), etc?
 
+TODO Trying running with `--with-lto` (ensure rebuild python in `build/build` first.). Also look into similarities/differences relative to emscripten flag: https://emscripten.org/docs/optimizing/Optimizing-Code.html#lto
+TODO Look into setting `--closure=1` as described here: https://emscripten.org/docs/optimizing/Optimizing-Code.html#miscellaneous-code-size-tips
+TODO Study module splitting more: https://emscripten.org/docs/optimizing/Module-Splitting.html#module-splitting
 
 ```bash
 # A representative --enable-wasm-dynamic-linking=yes build
